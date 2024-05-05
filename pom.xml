@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>parent-esb</artifactId>
+		<groupId>com.usb.esb</groupId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>router</artifactId>
+
+	<properties>
+		<camel-version>2.14.1</camel-version>
+        <distance.sales.url>http://localhost:8081</distance.sales.url>
+        <distance.sales.esb.url>http://localhost:8080/esb/distancesales</distance.sales.esb.url>
+        <distance.sales.url.dev>http://10.11.5.32:8077/distancesales</distance.sales.url.dev>
+        <distance.sales.esb.url.dev>http://10.11.5.32:8077/esb/distancesales</distance.sales.esb.url.dev>
+	</properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.usb</groupId>
+            <artifactId>distancesales.common</artifactId>
+            <version>1.0.2-SNAPSHOT</version>
+        </dependency>
+
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-spring</artifactId>
+			<version>${camel-version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-impl</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-servlet</artifactId>
+			<version>${camel-version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-impl</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-spring-javaconfig</artifactId>
+			<version>${camel-version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-impl</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-http4</artifactId>
+			<version>${camel-version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-impl</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-crypto</artifactId>
+			<version>${camel-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.10</version> <!-- Java 6+ -->
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.spring-crypto-utils</groupId>
+			<artifactId>spring-crypto-utils</artifactId>
+			<version>1.3.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-xmlsecurity</artifactId>
+			<version>${camel-version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.santuario</groupId>
+					<artifactId>xmlsec</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-test</artifactId>
+			<version>${camel-version}</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-impl</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!--<dependency> -->
+		<!--<groupId>org.apache.camel</groupId> -->
+		<!--<artifactId>camel-cxf</artifactId> -->
+		<!--<version>${camel-version}</version> -->
+		<!--</dependency> -->
+	</dependencies>
+
+    <profiles>
+        <profile>
+            <id>local</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <distance-sales-url>${distance.sales.url}</distance-sales-url>
+                <distance-sales-esb-url>${distance.sales.esb.url}</distance-sales-esb-url>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev_5_32</id>
+            <properties>
+                <distance-sales-url>${distance.sales.url.dev}</distance-sales-url>
+                <distance-sales-esb-url>${distance.sales.esb.url.dev}</distance-sales-esb-url>
+            </properties>
+        </profile>
+        <profile>
+            <id>production</id>
+            <properties>
+                <distance-sales-url>${distance.sales.url.dev}</distance-sales-url>
+                <distance-sales-esb-url>${distance.sales.esb.url.dev}</distance-sales-esb-url>
+            </properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>router.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>router.properties</exclude>
+                </excludes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-maven-plugin</artifactId>
+				<version>2.13.2</version>
+				<configuration>
+					<duration>5s</duration>
+					<configClasses>com.usb.esb.router.RouterAppConfig</configClasses>
+					<!-- You could set the base package directory and let spring to find 
+						the config classes for you <basedPackages>org.apache.camel.example.spring.javaconfig</basedPackages> -->
+				</configuration>
+			</plugin>
+		</plugins>
+
+		<finalName>router</finalName>
+	</build>
+</project>
